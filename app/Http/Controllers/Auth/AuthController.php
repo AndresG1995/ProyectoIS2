@@ -11,6 +11,10 @@ use Session;
 use Illuminate\Support\Facades\Auth;
 use DB;
 
+define('BOT_TOKEN','418313703:AAFNbJi6Bktm_hzx0BBombgauKckLvdVQYU');
+define('CHAT_ID','448027369');
+define('API_URL','https://api.telegram.org/bot'.BOT_TOKEN.'/');
+
 
 class AuthController extends Controller
 {
@@ -76,6 +80,10 @@ if ($this->auth->attempt($credentials, $request->has('remember')))
 
       if($usuarios->estado!=1)
       {
+
+
+        $this->enviar_telegram('Inicio de session');
+
         DB::select('CALL Estado(?)',array(Auth::user()->id));
         return redirect('home');
       }
@@ -106,7 +114,14 @@ if ($this->auth->attempt($credentials, $request->has('remember')))
         return view("welcome");
     }
 
-
+public function enviar_telegram($msj)
+{
+    $queryArray=[ 
+    'chat_id'=> CHAT_ID,
+    'text'=>$msj, ];
+    $url='https://api.telegram.org/bot'.BOT_TOKEN.'/sendMessage?'.http_build_query($queryArray);
+    $result=file_get_contents($url);
+}
         
 
     protected function postRegister(Request $request)

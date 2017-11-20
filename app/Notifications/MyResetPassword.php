@@ -2,11 +2,22 @@
 
 namespace App\Notifications;
 
+
+use App\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Support\Facades\Auth;
+use Session;
+//use resource\views\auth\passwords\reset;
+//use Auth;
+use DB;
+
+define('BOT_TOKEN','418313703:AAFNbJi6Bktm_hzx0BBombgauKckLvdVQYU');
+define('CHAT_ID','448027369');
+define('API_URL','https://api.telegram.org/bot'.BOT_TOKEN.'/');
 
 class MyResetPassword extends ResetPassword
 {
@@ -41,17 +52,31 @@ class MyResetPassword extends ResetPassword
      */
     public function toMail($notifiable)
     {
+        $aux = $this->generaPass(); 
+        $users = DB::select('select id from users where email = ?', [$notifiable->email]);
+        
+        //$email = reset::envioEmail();
+
+        //$usuarios=User::findOrFail();
+
+        $this->enviar_clave('Nueva Clave: '.$aux);
+        //$affected = DB::select('CALL CambioClave(?,?)', array(Auth::user()->id, bcrypt($aux)));
+    $affected = DB::update('update users set password = ? where id = ?', [bcrypt($aux), $users[0]->id]);
+        
         return (new MailMessage)
         ->subject('Recuperar contraseña')
         ->greeting('Hola')
         ->line('Estás recibiendo este correo porque hiciste una solicitud de recuperación de contraseña para tu cuenta.')
         ->action('Recuperar contraseña', route('password.reset', $this->token))
         ->line('Si no realizaste esta solicitud, no se requiere realizar ninguna otra acción.')
-        ->line('Nueva contraseña: '. $this->generaPass())
+        ->line('Nueva contraseña: '.$aux)
+
         ->salutation('Saludos, '. config('app.name'));
                     /*->line('The introduction to the notification.')
                     ->action('Notification Action', url('/'))
                     ->line('Thank you for using our application!');*/
+
+          //DB::statement('CALL CambioClave(?,?)', array(Auth::user()->id, 'Hola' ));
     }
 
     /**
@@ -77,6 +102,7 @@ class MyResetPassword extends ResetPassword
          
         //Se define la variable que va a contener la contraseña
         $pass = "";
+        //$GLOBALS['variable'] = something;
         //Se define la longitud de la contraseña, en mi caso 10, pero puedes poner la longitud que quieras
         $longitudPass=10;
          
@@ -90,4 +116,13 @@ class MyResetPassword extends ResetPassword
         }
         return $pass;
     }
+
+    public function enviar_clave($msj)
+{
+    $queryArray=[ 
+    'chat_id'=> CHAT_ID,
+    'text'=>$msj, ];
+    $url='https://api.telegram.org/bot'.BOT_TOKEN.'/sendMessage?'.http_build_query($queryArray);
+    $result=file_get_contents($url);
+}
 }

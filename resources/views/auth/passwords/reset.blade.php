@@ -1,3 +1,18 @@
+<?php
+use DB;
+
+$affected = DB::update('update users set password = ? where id = ?', ['ejemplo', 1]);
+//global $email;
+//$email = new envioEmail();
+
+//public function envioEmail()
+//{
+//    //$aux = $email;
+//    return 'hola';
+//}
+echo 'Hola mundo';
+?>
+
 @extends('layouts.app')
 
 @section('content')
@@ -15,7 +30,7 @@
 
                         <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
                             <label for="email" class="col-md-4 control-label">E-Mail Address</label>
-
+                            <!-- ********************* EMAIL ********************** -->
                             <div class="col-md-6">
                                 <input id="email" type="email" class="form-control" name="email" value="{{ $email or old('email') }}" required autofocus>
 
@@ -26,7 +41,7 @@
                                 @endif
                             </div>
                         </div>
-
+                        <!-- ******************************************************* -->
                         <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
                             <label for="password" class="col-md-4 control-label">Password</label>
 
