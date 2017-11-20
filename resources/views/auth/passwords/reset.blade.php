@@ -1,18 +1,3 @@
-<?php
-use DB;
-
-$affected = DB::update('update users set password = ? where id = ?', ['ejemplo', 1]);
-//global $email;
-//$email = new envioEmail();
-
-//public function envioEmail()
-//{
-//    //$aux = $email;
-//    return 'hola';
-//}
-echo 'Hola mundo';
-?>
-
 @extends('layouts.app')
 
 @section('content')

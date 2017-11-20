@@ -15,9 +15,9 @@ use Session;
 //use Auth;
 use DB;
 
-define('BOT_TOKEN','418313703:AAFNbJi6Bktm_hzx0BBombgauKckLvdVQYU');
-define('CHAT_ID','448027369');
-define('API_URL','https://api.telegram.org/bot'.BOT_TOKEN.'/');
+//define('BOT_TOKEN','418313703:AAFNbJi6Bktm_hzx0BBombgauKckLvdVQYU');
+//define('CHAT_ID','448027369');
+//define('API_URL','https://api.telegram.org/bot'.BOT_TOKEN.'/');
 
 class MyResetPassword extends ResetPassword
 {
@@ -52,17 +52,29 @@ class MyResetPassword extends ResetPassword
      */
     public function toMail($notifiable)
     {
+//      Cambio de clave manual
+//      echo bcrypt('HolaMundo');
+//      die();
+        
+        //Almaceno la nueva contraseña en la variable aux.
         $aux = $this->generaPass(); 
-        $users = DB::select('select id from users where email = ?', [$notifiable->email]);
-        
-        //$email = reset::envioEmail();
 
-        //$usuarios=User::findOrFail();
+        //Almaceno el id, token y char_id que me retorna la consulta a la base de datos en la variable users.
+        $users = DB::select('select id, token, char_id from users where email = ?', [$notifiable->email]);
 
+        //Se define las variables para el mensaje de Telegram.
+        define('BOT_TOKEN',$users[0]->token); //De la variable $users extraigo el token.
+        define('CHAT_ID',$users[0]->char_id); //De la variable $users extraigo el char id.
+        define('API_URL','https://api.telegram.org/bot'.$users[0]->token.'/');
+
+
+        //Envio de mensaje a Telegram
         $this->enviar_clave('Nueva Clave: '.$aux);
-        //$affected = DB::select('CALL CambioClave(?,?)', array(Auth::user()->id, bcrypt($aux)));
-    $affected = DB::update('update users set password = ? where id = ?', [bcrypt($aux), $users[0]->id]);
         
+        //Actualizo las password del usuario dependiendo del id que envie.
+        $affected = DB::update('update users set password = ? where id = ?', [bcrypt($aux), $users[0]->id]);
+        
+        //Personalizacion del Email
         return (new MailMessage)
         ->subject('Recuperar contraseña')
         ->greeting('Hola')
@@ -102,7 +114,7 @@ class MyResetPassword extends ResetPassword
          
         //Se define la variable que va a contener la contraseña
         $pass = "";
-        //$GLOBALS['variable'] = something;
+
         //Se define la longitud de la contraseña, en mi caso 10, pero puedes poner la longitud que quieras
         $longitudPass=10;
          
@@ -119,6 +131,7 @@ class MyResetPassword extends ResetPassword
 
     public function enviar_clave($msj)
 {
+
     $queryArray=[ 
     'chat_id'=> CHAT_ID,
     'text'=>$msj, ];

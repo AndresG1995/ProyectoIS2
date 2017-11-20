@@ -4,3 +4,5 @@ Cambio de estado en la tabla usuarios para evitar el logeo doble. Cambios en App
 
 La opcion para enviar la nueva contraseña generada aleatoriamente al hotmail y telegram,
 modificandola tambn en la base de datos, todos los cambios en App/Notifications/MyResetPassword.php
+
+Se implemento la opcion para cambio de contraseña una vez logueado.

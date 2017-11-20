@@ -11,9 +11,6 @@ use Session;
 use Illuminate\Support\Facades\Auth;
 use DB;
 
-define('BOT_TOKEN','418313703:AAFNbJi6Bktm_hzx0BBombgauKckLvdVQYU');
-define('CHAT_ID','448027369');
-define('API_URL','https://api.telegram.org/bot'.BOT_TOKEN.'/');
 
 
 class AuthController extends Controller
@@ -81,7 +78,12 @@ if ($this->auth->attempt($credentials, $request->has('remember')))
       if($usuarios->estado!=1)
       {
 
+        //Se define las variables para el mensaje de Telegram
+        define('BOT_TOKEN',Auth::user()->token);
+        define('CHAT_ID',Auth::user()->char_id);
+        define('API_URL','https://api.telegram.org/bot'.Auth::user()->token.'/');
 
+        //Envio de Mensaje con la frase "Inicio de Session"
         $this->enviar_telegram('Inicio de session');
 
         DB::select('CALL Estado(?)',array(Auth::user()->id));
